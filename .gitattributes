@@ -1,0 +1,7 @@
+# Left out of the archive Composer installs.
+/.gitattributes export-ignore
+/.github export-ignore
+/.gitignore export-ignore
+/docs/images export-ignore
+/phpunit.dist.xml export-ignore
+/tests export-ignore

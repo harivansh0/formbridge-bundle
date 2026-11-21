@@ -107,6 +107,22 @@ form_bridge:
 
 ## How saving is guarded
 
+```mermaid
+sequenceDiagram
+    participant A as AI assistant
+    participant F as FormBridge and your form
+    participant P as Person
+    participant H as Your handler
+    A->>F: create_booking(Friday, 2 seats, …)
+    Note over F: Your form checks the values. Nothing is saved.
+    F-->>A: "Friday has only 1 seat left"
+    F-->>P: The real form, filled in, with the error on its field
+    P->>F: Corrects it and presses Book (the form carries a secret token)
+    Note over F: The draft is closed. Your form checks again.
+    F->>H: The form's data
+    H-->>P: "Booking #5 …"
+```
+
 - The tool a model calls fills the form in and validates it. It never runs the handler.
 - A Symfony AI agent gets no other tool. Over MCP, each form has a second tool, `<name>_submit`,
   marked as visible to the form's MCP App only.

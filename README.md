@@ -5,6 +5,8 @@ FormBridge exposes Symfony forms as MCP tools, as forms a person completes insid
 validation back; none of the tools an agent is given can save. Saving requires the form shown to the
 person or the review page.
 
+![Four steps on an assistant screen: you ask for two seats on Friday; the assistant fills in the booking form and the form answers that Friday has one seat left; you pick Saturday; you press Book and the booking appears on the list](docs/images/formbridge-in-use.gif)
+
 ```php
 use FormBridge\Attribute\AsFormTool;
 
@@ -23,6 +25,10 @@ final class CreateBookingHandler
     }
 }
 ```
+
+## How it works
+
+![Six steps between an AI assistant, FormBridge with your form, and a person: the assistant calls the tool; your form checks the values and nothing is saved; the assistant gets the form's answer; the person gets the real form; the person presses Book; your form checks again and your handler saves once. The assistant has no tool that saves](docs/images/formbridge-flow.svg)
 
 ## Installation
 
