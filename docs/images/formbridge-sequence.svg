@@ -23,18 +23,18 @@
     .stop-text { fill: var(--stop); font-size: 12.5px; font-weight: 600; }
 
     /* Every step is visible by default, so the picture is complete wherever animation is off. */
-    .s { animation: 27s linear infinite both; }
+    .s { animation: 30s linear infinite both; }
     .s1 { animation-name: a1 } .s2 { animation-name: a2 } .s3 { animation-name: a3 } .s4 { animation-name: a4 } .s5 { animation-name: a5 }
     .s6 { animation-name: a6 } .s7 { animation-name: a7 } .s8 { animation-name: a8 } .s9 { animation-name: a9 }
-    @keyframes a1 { 0%, 1% { opacity: 0 } 4%, 94% { opacity: 1 } 98%, 100% { opacity: 0 } }
-    @keyframes a2 { 0%, 10% { opacity: 0 } 13%, 94% { opacity: 1 } 98%, 100% { opacity: 0 } }
-    @keyframes a3 { 0%, 19% { opacity: 0 } 22%, 94% { opacity: 1 } 98%, 100% { opacity: 0 } }
-    @keyframes a4 { 0%, 28% { opacity: 0 } 31%, 94% { opacity: 1 } 98%, 100% { opacity: 0 } }
-    @keyframes a5 { 0%, 37% { opacity: 0 } 40%, 94% { opacity: 1 } 98%, 100% { opacity: 0 } }
-    @keyframes a6 { 0%, 46% { opacity: 0 } 49%, 94% { opacity: 1 } 98%, 100% { opacity: 0 } }
-    @keyframes a7 { 0%, 55% { opacity: 0 } 58%, 94% { opacity: 1 } 98%, 100% { opacity: 0 } }
-    @keyframes a8 { 0%, 64% { opacity: 0 } 67%, 94% { opacity: 1 } 98%, 100% { opacity: 0 } }
-    @keyframes a9 { 0%, 76% { opacity: 0 } 79%, 94% { opacity: 1 } 98%, 100% { opacity: 0 } }
+    @keyframes a1 { 0%, 1% { opacity: 0 } 3%, 95% { opacity: 1 } 98%, 100% { opacity: 0 } }
+    @keyframes a2 { 0%, 5% { opacity: 0 } 7%, 95% { opacity: 1 } 98%, 100% { opacity: 0 } }
+    @keyframes a3 { 0%, 9% { opacity: 0 } 11%, 95% { opacity: 1 } 98%, 100% { opacity: 0 } }
+    @keyframes a4 { 0%, 13% { opacity: 0 } 15%, 95% { opacity: 1 } 98%, 100% { opacity: 0 } }
+    @keyframes a5 { 0%, 17% { opacity: 0 } 19%, 95% { opacity: 1 } 98%, 100% { opacity: 0 } }
+    @keyframes a6 { 0%, 21% { opacity: 0 } 23%, 95% { opacity: 1 } 98%, 100% { opacity: 0 } }
+    @keyframes a7 { 0%, 25% { opacity: 0 } 27%, 95% { opacity: 1 } 98%, 100% { opacity: 0 } }
+    @keyframes a8 { 0%, 29% { opacity: 0 } 31%, 95% { opacity: 1 } 98%, 100% { opacity: 0 } }
+    @keyframes a9 { 0%, 33% { opacity: 0 } 35%, 95% { opacity: 1 } 98%, 100% { opacity: 0 } }
     @media (prefers-reduced-motion: reduce) { .s { animation: none; } }
   </style>
 
