@@ -109,18 +109,23 @@ form_bridge:
 
 ```mermaid
 sequenceDiagram
-    participant A as AI assistant
-    participant F as FormBridge and your form
+    participant C as Agent or MCP client
+    participant F as FormBridge
+    participant A as Your form type and handler
     participant P as Person
-    participant H as Your handler
-    A->>F: create_booking(Friday, 2 seats, …)
-    Note over F: Your form checks the values. Nothing is saved.
-    F-->>A: "Friday has only 1 seat left"
-    F-->>P: The real form, filled in, with the error on its field
-    P->>F: Corrects it and presses Book (the form carries a secret token)
-    Note over F: The draft is closed. Your form checks again.
-    F->>H: The form's data
-    H-->>P: "Booking #5 …"
+    C->>F: tools/call #lt;name#gt; {values}
+    F->>A: FormToolRunner::draft()
+    Note over A: The form type validates. The handler is not called.
+    A-->>F: FormOutcome, FormDraftedEvent
+    Note over F: DraftStore::open() stores a draft with a review token and a submit token
+    F-->>C: content and structuredContent (valid, saved, values, errors, reviewUrl)
+    F-->>P: _meta['formbridge/html'], shown at ui://formbridge-form or behind reviewUrl
+    P->>F: tools/call #lt;name#gt;_submit {fields, _formbridge_token}
+    Note over F: The token is checked. DraftStore::claim() locks and closes the draft.
+    F->>A: FormToolRunner::submit()
+    Note over A: Validates again, dispatches FormSubmitEvent, then calls the handler
+    A-->>F: result, FormSavedEvent
+    F-->>P: saved: true, result
 ```
 
 - The tool a model calls fills the form in and validates it. It never runs the handler.

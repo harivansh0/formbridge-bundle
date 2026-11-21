@@ -5,8 +5,6 @@ FormBridge exposes Symfony forms as MCP tools, as forms a person completes insid
 validation back; none of the tools an agent is given can save. Saving requires the form shown to the
 person or the review page.
 
-![Four steps on an assistant screen: you ask for two seats on Friday; the assistant fills in the booking form and the form answers that Friday has one seat left; you pick Saturday; you press Book and the booking appears on the list](docs/images/formbridge-in-use.gif)
-
 ```php
 use FormBridge\Attribute\AsFormTool;
 
@@ -28,7 +26,11 @@ final class CreateBookingHandler
 
 ## How it works
 
-![Six steps between an AI assistant, FormBridge with your form, and a person: the assistant calls the tool; your form checks the values and nothing is saved; the assistant gets the form's answer; the person gets the real form; the person presses Book; your form checks again and your handler saves once. The assistant has no tool that saves](docs/images/formbridge-flow.svg)
+![Sequence of one form tool call. 1: an agent or MCP client calls the tool with values. 2: FormToolRunner::draft() has the form type validate them, returns a FormOutcome and dispatches FormDraftedEvent; the handler is not called. 3: DraftStore::open() stores a draft with a review token, a submit token and an expiry. 4: the client gets content and structuredContent with the form's validation messages. 5: the rendered form travels in _meta and reaches a person as an MCP App at ui://formbridge-form, or behind the review link. 6: the person's submit calls the submit tool with the fields and the token; that tool is not offered to the model. 7: the token is checked and DraftStore::claim() locks and closes the draft. 8: FormToolRunner::submit() validates again, dispatches FormSubmitEvent and calls the handler, then dispatches FormSavedEvent. 9: the person gets saved: true and the handler's result](docs/images/formbridge-sequence.svg)
+
+`Agent\FormToolbox` (Symfony AI agents) and `Ai\FormFiller` (free text) enter at step 2.
+`Controller\ReviewController` takes steps 6 to 9 for clients that cannot show an MCP App.
+[How saving is guarded](docs/index.md#how-saving-is-guarded) explains each step.
 
 ## Installation
 

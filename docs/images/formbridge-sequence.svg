@@ -1,0 +1,144 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 700" role="img" aria-labelledby="t d">
+  <title id="t">FormBridge: the sequence of one form tool call</title>
+  <desc id="d">Sequence between an agent or MCP client, FormBridge, the application's form type and handler, and a person. 1: the client calls the tool. 2: FormToolRunner::draft() lets the form type validate, returns a FormOutcome and dispatches FormDraftedEvent; the handler is not called. 3: DraftStore::open() keeps a draft with a review token and a submit token. 4: the client gets text and structured content. 5: the rendered form travels in _meta and is shown as an MCP App or behind the review link. 6: the person's submit calls the app-only submit tool with the token. 7: the token is checked and DraftStore::claim() locks and closes the draft. 8: FormToolRunner::submit() validates again, dispatches FormSubmitEvent and calls the handler, then FormSavedEvent. 9: the person gets the confirmation. The submit tool is not offered to the model.</desc>
+  <style>
+    :root { --bg: #f5f7f6; --card: #ffffff; --fg: #18211f; --muted: #5b6966; --line: #c3cfcb; --accent: #0f6e66; --soft: #e2f1ee; --stop: #a3261e; --stop-soft: #fbe9e7; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #111715; --card: #18201e; --fg: #e6eceb; --muted: #9aa8a5; --line: #3a4a46; --accent: #5fc4b8; --soft: #17302c; --stop: #f28b82; --stop-soft: #3a201e; }
+    }
+    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; fill: var(--fg); }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+    .head { font-size: 16px; font-weight: 600; }
+    .sub { font-size: 12px; fill: var(--muted); }
+    .note { font-size: 12.5px; fill: var(--muted); }
+    .num { font-size: 12.5px; font-weight: 700; fill: var(--card); }
+    .lane { fill: var(--card); stroke: var(--line); stroke-width: 1.5; }
+    .life { stroke: var(--line); stroke-width: 2; stroke-dasharray: 5 7; }
+    .arrow { stroke: var(--accent); stroke-width: 2.2; fill: none; }
+    .back { stroke: var(--accent); stroke-width: 2; fill: none; stroke-dasharray: 6 5; }
+    .tip { fill: var(--accent); }
+    .dot { fill: var(--accent); }
+    .box { fill: var(--soft); stroke: var(--accent); stroke-width: 1.5; }
+    .stop { fill: var(--stop-soft); stroke: var(--stop); stroke-width: 1.5; }
+    .stop-text { fill: var(--stop); font-size: 12.5px; font-weight: 600; }
+
+    /* Every step is visible by default, so the picture is complete wherever animation is off. */
+    .s { animation: 27s linear infinite both; }
+    .s1 { animation-name: a1 } .s2 { animation-name: a2 } .s3 { animation-name: a3 } .s4 { animation-name: a4 } .s5 { animation-name: a5 }
+    .s6 { animation-name: a6 } .s7 { animation-name: a7 } .s8 { animation-name: a8 } .s9 { animation-name: a9 }
+    @keyframes a1 { 0%, 1% { opacity: 0 } 4%, 94% { opacity: 1 } 98%, 100% { opacity: 0 } }
+    @keyframes a2 { 0%, 10% { opacity: 0 } 13%, 94% { opacity: 1 } 98%, 100% { opacity: 0 } }
+    @keyframes a3 { 0%, 19% { opacity: 0 } 22%, 94% { opacity: 1 } 98%, 100% { opacity: 0 } }
+    @keyframes a4 { 0%, 28% { opacity: 0 } 31%, 94% { opacity: 1 } 98%, 100% { opacity: 0 } }
+    @keyframes a5 { 0%, 37% { opacity: 0 } 40%, 94% { opacity: 1 } 98%, 100% { opacity: 0 } }
+    @keyframes a6 { 0%, 46% { opacity: 0 } 49%, 94% { opacity: 1 } 98%, 100% { opacity: 0 } }
+    @keyframes a7 { 0%, 55% { opacity: 0 } 58%, 94% { opacity: 1 } 98%, 100% { opacity: 0 } }
+    @keyframes a8 { 0%, 64% { opacity: 0 } 67%, 94% { opacity: 1 } 98%, 100% { opacity: 0 } }
+    @keyframes a9 { 0%, 76% { opacity: 0 } 79%, 94% { opacity: 1 } 98%, 100% { opacity: 0 } }
+    @media (prefers-reduced-motion: reduce) { .s { animation: none; } }
+  </style>
+
+  <rect width="1060" height="700" rx="14" fill="var(--bg)"/>
+
+  <!-- Participants -->
+  <rect class="lane" x="24" y="24" width="212" height="58" rx="10"/>
+  <text class="head" x="130" y="49" text-anchor="middle">Agent or MCP client</text>
+  <text class="sub" x="130" y="68" text-anchor="middle">the model's side</text>
+
+  <rect class="lane" x="316" y="24" width="208" height="58" rx="10"/>
+  <text class="head" x="420" y="49" text-anchor="middle">FormBridge</text>
+  <text class="sub" x="420" y="68" text-anchor="middle">this bundle</text>
+
+  <rect class="lane" x="596" y="24" width="208" height="58" rx="10"/>
+  <text class="head" x="700" y="49" text-anchor="middle">Your application</text>
+  <text class="sub" x="700" y="68" text-anchor="middle">form type and handler</text>
+
+  <rect class="lane" x="846" y="24" width="190" height="58" rx="10"/>
+  <text class="head" x="941" y="49" text-anchor="middle">Person</text>
+  <text class="sub" x="941" y="68" text-anchor="middle">MCP App or review page</text>
+
+  <line class="life" x1="130" y1="82" x2="130" y2="676"/>
+  <line class="life" x1="420" y1="82" x2="420" y2="676"/>
+  <line class="life" x1="700" y1="82" x2="700" y2="676"/>
+  <line class="life" x1="941" y1="82" x2="941" y2="676"/>
+
+  <!-- 1 -->
+  <g class="s s1">
+    <text class="mono" x="282" y="114" text-anchor="middle">tools/call &lt;name&gt; {values}</text>
+    <line class="arrow" x1="143" y1="126" x2="403" y2="126"/><path class="tip" d="M415 126 l-13 -6.5 v13 z"/>
+    <circle class="dot" cx="130" cy="126" r="12"/><text class="num" x="130" y="130.5" text-anchor="middle">1</text>
+  </g>
+
+  <!-- 2 -->
+  <g class="s s2">
+    <text class="mono" x="567" y="160" text-anchor="middle">FormToolRunner::draft()</text>
+    <line class="arrow" x1="433" y1="172" x2="683" y2="172"/><path class="tip" d="M695 172 l-13 -6.5 v13 z"/>
+    <circle class="dot" cx="420" cy="172" r="12"/><text class="num" x="420" y="176.5" text-anchor="middle">2</text>
+    <text class="note" x="712" y="176">the form type validates;</text>
+    <text class="note" x="712" y="192">the handler is not called</text>
+    <line class="back" x1="686" y1="214" x2="438" y2="214"/><path class="tip" d="M426 214 l13 -6.5 v13 z"/>
+    <text class="mono" x="560" y="206" text-anchor="middle">FormOutcome, FormDraftedEvent</text>
+  </g>
+
+  <!-- 3 -->
+  <g class="s s3">
+    <rect class="box" x="290" y="236" width="300" height="52" rx="8"/>
+    <text class="mono" x="455" y="258" text-anchor="middle">DraftStore::open()</text>
+    <text class="note" x="455" y="276" text-anchor="middle">review token, submit token, expiry</text>
+    <circle class="dot" cx="312" cy="262" r="12"/><text class="num" x="312" y="266.5" text-anchor="middle">3</text>
+  </g>
+
+  <!-- 4 -->
+  <g class="s s4">
+    <text class="mono" x="275" y="318" text-anchor="middle">content + structuredContent</text>
+    <line class="back" x1="406" y1="330" x2="148" y2="330"/><path class="tip" d="M136 330 l13 -6.5 v13 z"/>
+    <circle class="dot" cx="420" cy="330" r="12"/><text class="num" x="420" y="334.5" text-anchor="middle">4</text>
+    <text class="note" x="275" y="349" text-anchor="middle">the form's own validation messages</text>
+  </g>
+
+  <!-- 5 -->
+  <g class="s s5">
+    <text class="mono" x="690" y="372" text-anchor="middle">_meta['formbridge/html']  →  ui://formbridge-form</text>
+    <line class="arrow" x1="433" y1="384" x2="924" y2="384"/><path class="tip" d="M936 384 l-13 -6.5 v13 z"/>
+    <circle class="dot" cx="420" cy="384" r="12"/><text class="num" x="420" y="388.5" text-anchor="middle">5</text>
+    <text class="note" x="690" y="403" text-anchor="middle">the form rendered by Twig, as an MCP App or behind the review link</text>
+  </g>
+
+  <!-- 6 -->
+  <g class="s s6">
+    <text class="mono" x="690" y="438" text-anchor="middle">tools/call &lt;name&gt;_submit {fields, token}</text>
+    <line class="arrow" x1="928" y1="450" x2="438" y2="450"/><path class="tip" d="M426 450 l13 -6.5 v13 z"/>
+    <circle class="dot" cx="941" cy="450" r="12"/><text class="num" x="941" y="454.5" text-anchor="middle">6</text>
+    <rect class="stop" x="34" y="426" width="192" height="50" rx="8"/>
+    <text class="stop-text" x="130" y="447" text-anchor="middle">&lt;name&gt;_submit is not</text>
+    <text class="stop-text" x="130" y="465" text-anchor="middle">offered to the model</text>
+  </g>
+
+  <!-- 7 -->
+  <g class="s s7">
+    <rect class="box" x="290" y="478" width="300" height="52" rx="8"/>
+    <text class="mono" x="455" y="500" text-anchor="middle">DraftStore::claim()</text>
+    <text class="note" x="455" y="518" text-anchor="middle">token checked, draft locked and closed</text>
+    <circle class="dot" cx="312" cy="504" r="12"/><text class="num" x="312" y="508.5" text-anchor="middle">7</text>
+  </g>
+
+  <!-- 8 -->
+  <g class="s s8">
+    <text class="mono" x="567" y="560" text-anchor="middle">FormToolRunner::submit()</text>
+    <line class="arrow" x1="433" y1="572" x2="683" y2="572"/><path class="tip" d="M695 572 l-13 -6.5 v13 z"/>
+    <circle class="dot" cx="420" cy="572" r="12"/><text class="num" x="420" y="576.5" text-anchor="middle">8</text>
+    <text class="note" x="712" y="568">validates again,</text>
+    <text class="note" x="712" y="584">FormSubmitEvent,</text>
+    <text class="note" x="712" y="600">then the handler</text>
+    <line class="back" x1="686" y1="620" x2="438" y2="620"/><path class="tip" d="M426 620 l13 -6.5 v13 z"/>
+    <text class="mono" x="560" y="612" text-anchor="middle">result, FormSavedEvent</text>
+  </g>
+
+  <!-- 9 -->
+  <g class="s s9">
+    <text class="mono" x="690" y="648" text-anchor="middle">saved: true, result</text>
+    <line class="back" x1="433" y1="660" x2="924" y2="660"/><path class="tip" d="M936 660 l-13 -6.5 v13 z"/>
+    <circle class="dot" cx="420" cy="660" r="12"/><text class="num" x="420" y="664.5" text-anchor="middle">9</text>
+  </g>
+
+</svg>
