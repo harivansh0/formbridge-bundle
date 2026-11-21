@@ -6,6 +6,7 @@ namespace FormBridge\Tests\Unit;
 
 use FormBridge\DependencyInjection\FormToolPass;
 use FormBridge\FormToolRegistry;
+use FormBridge\Mcp\FormBridgeApp;
 use FormBridge\Mcp\FormToolLoader;
 use FormBridge\Mcp\FreshStateListener;
 use FormBridge\Tests\Fixtures\InheritedOrderTool;
@@ -76,6 +77,46 @@ final class WiringTest extends TestCase
         $this->expectExceptionMessage('"Order"');
 
         (new FormToolPass())->process($inherited);
+    }
+
+    public function testAToolOnAnotherServerCannotClash(): void
+    {
+        $container = $this->containerWithFormTool('order');
+        $container->register('form_bridge.mcp.loader', FormToolLoader::class)->addTag('mcp.loader');
+        $container->register('form_bridge.mcp.app', FormBridgeApp::class)->addTag('mcp.app');
+        $container->register('mcp.server.staff.builder', \stdClass::class);
+        $container->register(OrderSubmitTool::class)->addTag('mcp.tool', ['method' => '__invoke']);
+        $container->setParameter(FormToolPass::SERVERS_PARAMETER, ['staff']);
+        $container->setParameter('mcp.servers.elements', [
+            'public' => ['tools' => [OrderSubmitTool::class], 'apps' => []],
+            'staff' => ['tools' => ['App\\Staff\\'], 'apps' => [FormBridgeApp::class]],
+        ]);
+
+        (new FormToolPass())->process($container);
+        self::assertArrayHasKey('order', $container->getDefinition('form_bridge.registry')->getArgument(0));
+
+        // On the same server it is a clash.
+        $container->setParameter('mcp.servers.elements', [
+            'staff' => ['tools' => ['*'], 'apps' => ['*']],
+        ]);
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('on the same server');
+
+        (new FormToolPass())->process($container);
+    }
+
+    public function testAServerThatGetsTheFormToolsMustLetTheFormScreenIn(): void
+    {
+        $container = $this->containerWithFormTool('order');
+        $container->register('form_bridge.mcp.app', FormBridgeApp::class)->addTag('mcp.app');
+        $container->setParameter('mcp.servers.elements', [
+            'default' => ['tools' => ['App\\Mcp\\'], 'apps' => ['App\\Mcp\\']],
+        ]);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('does not let the form\'s screen in');
+
+        (new FormToolPass())->process($container);
     }
 
     public function testAnAbstractToolDefinitionCannotClash(): void

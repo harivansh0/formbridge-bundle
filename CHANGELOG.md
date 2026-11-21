@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.1 (2026-11-21)
+
+- Option labels are quoted when they are described to a model, in tool descriptions and in a
+  form's answer, so that a label cannot pass for a second option.
+- A name clash with a `#[McpTool]` service is only an error when both are on the same MCP server.
+- Building the container fails when a server gets the form tools but its registry leaves out
+  the form's screen (`FormBridge\Mcp\FormBridgeApp`).
+- A chained cache pool is also refused when the profiler wraps it.
+- An agent cannot run a form tool that is not exposed.
+
 ## 0.1.0 (2026-11-21)
 
 First release.

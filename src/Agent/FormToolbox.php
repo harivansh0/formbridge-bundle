@@ -50,7 +50,8 @@ final class FormToolbox implements ToolboxInterface
 
     public function execute(ToolCall $toolCall): ToolResult
     {
-        if (!$this->tools->has($toolCall->getName())) {
+        $name = $toolCall->getName();
+        if (!$this->tools->has($name) || null !== $this->schemas->problemWith($this->tools->get($name))) {
             return $this->inner?->execute($toolCall) ?? throw ToolNotFoundException::notFoundForToolCall($toolCall);
         }
 

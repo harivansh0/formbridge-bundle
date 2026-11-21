@@ -69,6 +69,22 @@ final class FormInspector
         return array_values($choices);
     }
 
+    /**
+     * Options as "value = label" pairs for a model. Labels are quoted as JSON strings: they often
+     * hold text that users entered, and a quoted label cannot pass for a second option.
+     *
+     * @param list<array{value: string, label: string}> $choices
+     */
+    public static function describeChoices(array $choices): string
+    {
+        return implode('; ', array_map(
+            static fn (array $choice): string => $choice['value'] === $choice['label']
+                ? $choice['value']
+                : $choice['value'].' = '.json_encode($choice['label'], \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES),
+            $choices,
+        ));
+    }
+
     public static function label(FormInterface $field): ?string
     {
         return self::text($field->getConfig()->getOption('label'));

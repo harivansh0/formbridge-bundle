@@ -9,6 +9,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
+use Symfony\Component\Cache\Adapter\TraceableAdapter;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\InMemoryStore;
 
@@ -44,6 +45,13 @@ final class DraftStoreTest extends TestCase
         $this->expectExceptionMessage('chained cache pool');
 
         new DraftStore(new ChainAdapter([new ArrayAdapter(), new ArrayAdapter()]), new LockFactory(new InMemoryStore()));
+    }
+
+    public function testAChainedPoolIsRecognisedBehindTheProfilersWrapper(): void
+    {
+        $this->expectException(\LogicException::class);
+
+        new DraftStore(new TraceableAdapter(new ChainAdapter([new ArrayAdapter(), new ArrayAdapter()])), new LockFactory(new InMemoryStore()));
     }
 
     public function testADraftIsFoundByEitherTokenOfItsOwnToolOnly(): void

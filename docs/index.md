@@ -90,7 +90,7 @@ form_bridge:
 | Key | Default | Meaning |
 |---|---|---|
 | `agents` | `[]` | Symfony AI agents (names under `ai.agent`) whose toolbox gets every form tool. Needs `symfony/ai-bundle` 1.0 with that agent configured and its `tools` enabled |
-| `mcp_servers` | `[]` | MCP servers (names under `mcp.servers`) that expose the form tools. Empty: every server. The `registry` of each of them must let `FormBridge\Mcp\FormBridgeApp` in (`*` does), because that is the screen the form is shown on |
+| `mcp_servers` | `[]` | MCP servers (names under `mcp.servers`) that expose the form tools. Empty: every server. The `registry` of each server that gets the tools must let `FormBridge\Mcp\FormBridgeApp` in (`*` does), because that is the screen the form is shown on; this is checked when the container is built |
 | `review_page` | `true` | Whether a filled-in form is also offered as a link to a web page. Turn it off if all your clients show forms in the conversation |
 | `drafts.lifetime` | `3600` | How many seconds a form stays open for the person, counted from the moment it was filled in |
 | `drafts.cache_pool` | own pool on `cache.app` | Service id of the PSR-6 cache pool that keeps filled-in forms |
@@ -219,7 +219,7 @@ your tools go through the `messages` domain. What the model reads is always Engl
 ## Services
 
 Service ids start with `form_bridge.`; the three controllers are registered under their class
-names. These classes can be autowired: `FormToolRunner`,
+names. They are plain services and do not extend `AbstractController`. These classes can be autowired: `FormToolRunner`,
 `FormToolRegistry`, `FormToolSchemas`, `DraftStore`, `Form\FormSchemaFactory`, `Agent\DraftLog`,
 `Mcp\FormToolResponder` and, when `fill` is enabled, `Ai\FormFiller`.
 
@@ -241,11 +241,12 @@ The form responds to that value in the application's own words.
 - Labels given as translatable objects are not carried into the schema.
 - Only rules of the default validation group are described, and only these constraints: `NotBlank`,
   `NotNull`, `Range`, `Positive`, `PositiveOrZero`, `Length` and `Email`.
-- A choice field lists all its options in the tool description.
+- A choice field lists all its options in the tool description, each label quoted and marked as
+  data.
 - An empty nested group sent as `{}` is rejected by the MCP SDK before the form runs.
 - Number fields that use digit grouping in a locale where "." is the grouping sign are not supported.
 - A handler's refusal is put on the field with the same name as its path; forms that rename fields
   with `property_path` get it on the form as a whole.
-- A clash between a form tool's name and a `#[McpTool]` service fails at compile time, whichever
-  servers the two are on; tools registered in other ways are not checked.
+- A clash between a form tool's name and a `#[McpTool]` service on the same server fails when the
+  container is built; tools registered in other ways are not checked.
 - Tested on PHP 8.2 with Symfony 7.4 and on PHP 8.4 with Symfony 8.1.

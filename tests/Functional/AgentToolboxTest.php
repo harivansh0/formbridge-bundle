@@ -42,7 +42,7 @@ final class AgentToolboxTest extends FunctionalTestCase
         self::assertCount(1, $tools);
         self::assertSame('place_order', $tools[0]->getName());
         self::assertTrue($tools[0]->isReadOnly());
-        self::assertStringContainsString('espresso = Espresso beans (3 left)', $tools[0]->getParameters()['properties']['product']['description']);
+        self::assertStringContainsString('espresso = "Espresso beans (3 left)"', $tools[0]->getParameters()['properties']['product']['description']);
     }
 
     public function testThereIsNoToolForSaving(): void

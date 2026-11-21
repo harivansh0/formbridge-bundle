@@ -6,6 +6,7 @@ namespace FormBridge;
 
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
+use Symfony\Component\Cache\Adapter\TraceableAdapter;
 use Symfony\Component\Lock\LockFactory;
 
 /**
@@ -23,7 +24,11 @@ final class DraftStore
     ) {
         // A local tier in front of the shared store can answer "still open" after another request
         // has saved the draft, which would let it be saved twice.
-        if ($cache instanceof ChainAdapter) {
+        $pool = $cache;
+        while ($pool instanceof TraceableAdapter) {
+            $pool = $pool->getPool();
+        }
+        if ($pool instanceof ChainAdapter) {
             throw new \LogicException('FormBridge cannot keep drafts in a chained cache pool: use the shared store directly.');
         }
     }

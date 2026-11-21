@@ -29,7 +29,7 @@ final class ConsoleAndPreviewTest extends FunctionalTestCase
         $command->assertCommandIsSuccessful();
         self::assertStringContainsString('Order coffee beans.', $command->getDisplay());
         self::assertStringContainsString('"additionalProperties": false', $command->getDisplay());
-        self::assertStringContainsString('espresso = Espresso beans (3 left)', $command->getDisplay());
+        self::assertStringContainsString('espresso = \\"Espresso beans (3 left)\\"', $command->getDisplay());
     }
 
     public function testAnUnknownToolIsAnError(): void

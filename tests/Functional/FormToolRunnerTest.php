@@ -46,7 +46,7 @@ final class FormToolRunnerTest extends FunctionalTestCase
 
         self::assertSame('string', $properties['product']['type']);
         self::assertArrayNotHasKey('enum', $properties['product']);
-        self::assertStringContainsString('espresso = Espresso beans (3 left)', $properties['product']['description']);
+        self::assertStringContainsString('espresso = "Espresso beans (3 left)"', $properties['product']['description']);
 
         self::assertSame('integer', $properties['quantity']['type']);
         self::assertSame('Bags of 250 g. Required. Between 1 and 5.', $properties['quantity']['description']);

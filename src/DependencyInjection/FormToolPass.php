@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace FormBridge\DependencyInjection;
 
+use FormBridge\Mcp\FormBridgeApp;
 use Mcp\Capability\Attribute\McpTool;
+use Symfony\AI\McpBundle\DependencyInjection\ElementMatcher;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -18,6 +20,7 @@ final class FormToolPass implements CompilerPassInterface
 
     private const REGISTRY = 'form_bridge.registry';
     private const LOADER = 'form_bridge.mcp.loader';
+    private const APP = 'form_bridge.mcp.app';
 
     public function process(ContainerBuilder $container): void
     {
@@ -51,8 +54,11 @@ final class FormToolPass implements CompilerPassInterface
             }
         }
 
-        $this->rejectNamesOfOtherMcpTools($container, array_keys($definitions));
         $this->limitToConfiguredServers($container);
+        if ([] !== $definitions) {
+            $this->rejectNamesOfOtherMcpTools($container, array_keys($definitions));
+            $this->requireTheFormScreen($container);
+        }
 
         $container->getDefinition(self::REGISTRY)
             ->replaceArgument(0, $definitions)
@@ -61,13 +67,16 @@ final class FormToolPass implements CompilerPassInterface
 
     /**
      * The MCP registry lets a later registration replace an earlier one without a word, and form
-     * tools are registered first. Names are compared across all servers.
+     * tools are registered first. Only tools on a server that also has the form tools can clash.
      *
      * @param list<string> $names
      */
     private function rejectNamesOfOtherMcpTools(ContainerBuilder $container, array $names): void
     {
         $taken = array_fill_keys([...$names, ...array_map(static fn (string $name): string => $name.'_submit', $names)], true);
+        $elements = $this->serverElements($container);
+        $matcher = new ElementMatcher($elements);
+        $formServers = $this->serversWithFormTools($container);
 
         foreach ($container->findTaggedServiceIds('mcp.tool') as $serviceId => $tags) {
             $definition = $container->getDefinition($serviceId);
@@ -77,6 +86,10 @@ final class FormToolPass implements CompilerPassInterface
             $class = $container->getParameterBag()->resolveValue($definition->getClass() ?? $serviceId);
             $reflection = \is_string($class) ? $container->getReflectionClass($class, false) : null;
             if (null === $reflection) {
+                continue;
+            }
+            // Without the servers' registries (no MCP bundle configuration), every tool counts.
+            if ([] !== $elements && [] === array_intersect($matcher->match('tools', $serviceId, $reflection->getName()), $formServers)) {
                 continue;
             }
 
@@ -94,8 +107,27 @@ final class FormToolPass implements CompilerPassInterface
                 $name = $attribute?->newInstance()->name ?? ('__invoke' === $method ? $reflectionMethod->getDeclaringClass()->getShortName() : $method);
 
                 if (isset($taken[$name])) {
-                    throw new LogicException(\sprintf('The MCP tool "%s" of service "%s" has the name of a form tool or of a form\'s submit tool. Rename one of them.', $name, $serviceId));
+                    throw new LogicException(\sprintf('The MCP tool "%s" of service "%s" has the name of a form tool or of a form\'s submit tool on the same server. Rename one of them.', $name, $serviceId));
                 }
+            }
+        }
+    }
+
+    /**
+     * A form tool points at the screen the form is shown on. A server that gets the tools must
+     * let that screen through its registry as well.
+     */
+    private function requireTheFormScreen(ContainerBuilder $container): void
+    {
+        $elements = $this->serverElements($container);
+        if ([] === $elements || !$container->hasDefinition(self::APP)) {
+            return;
+        }
+
+        $withScreen = (new ElementMatcher($elements))->match('apps', self::APP, FormBridgeApp::class);
+        foreach ($this->serversWithFormTools($container) as $server) {
+            if (isset($elements[$server]) && !\in_array($server, $withScreen, true)) {
+                throw new LogicException(\sprintf('The MCP server "%s" gets the form tools, but its registry does not let the form\'s screen in. Add "%s" (or "*") to "mcp.servers.%s.registry", or leave the server out of "form_bridge.mcp_servers".', $server, FormBridgeApp::class, $server));
             }
         }
     }
@@ -106,7 +138,7 @@ final class FormToolPass implements CompilerPassInterface
      */
     private function limitToConfiguredServers(ContainerBuilder $container): void
     {
-        $servers = $container->hasParameter(self::SERVERS_PARAMETER) ? (array) $container->getParameter(self::SERVERS_PARAMETER) : [];
+        $servers = $this->configuredServers($container);
         if ([] === $servers || !$container->hasDefinition(self::LOADER)) {
             return;
         }
@@ -121,5 +153,33 @@ final class FormToolPass implements CompilerPassInterface
 
             $container->getDefinition($builderId)->addMethodCall('addLoaders', [[new Reference(self::LOADER)]]);
         }
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function serversWithFormTools(ContainerBuilder $container): array
+    {
+        $configured = $this->configuredServers($container);
+
+        return [] === $configured ? array_keys($this->serverElements($container)) : $configured;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function configuredServers(ContainerBuilder $container): array
+    {
+        return $container->hasParameter(self::SERVERS_PARAMETER) ? array_values((array) $container->getParameter(self::SERVERS_PARAMETER)) : [];
+    }
+
+    /**
+     * What each MCP server lets through its registry: server => kind => patterns.
+     *
+     * @return array<string, array<string, list<string>>>
+     */
+    private function serverElements(ContainerBuilder $container): array
+    {
+        return $container->hasParameter('mcp.servers.elements') ? (array) $container->getParameter('mcp.servers.elements') : [];
     }
 }
