@@ -2,6 +2,7 @@
     The MCP App shell for every form tool. The protocol work is the MCP bundle's bridge; the
     functions below replace the parts of it that do not suit a form that saves.
 #}
+{% trans_default_domain 'form_bridge' %}
 {% extends '@Mcp/app/base.html.twig' %}
 
 {% block title %}Form{% endblock %}
@@ -15,7 +16,7 @@
 
 {% block style %}{{ include('@FormBridge/_styles.css.twig') }}{% endblock %}
 
-{% block body %}<div id="root"><p class="fb-wait">Preparing the form…</p></div>{% endblock %}
+{% block body %}<div id="root"><p class="fb-wait">{{ 'Preparing the form…'|trans }}</p></div>{% endblock %}
 
 {% block app_script %}
         // The rendered form travels in `_meta`, not in `structuredContent`.
@@ -24,7 +25,7 @@
             const html = params._meta && params._meta['{{ constant('FormBridge\\Mcp\\FormBridgeApp::HTML_META_KEY') }}'];
             if (typeof html === 'string') return { html };
             const text = (params.content || []).filter((item) => item.type === 'text').map((item) => item.text).join(' ');
-            return { problem: text || 'The form could not be sent.' };
+            return { problem: text || {{ 'The form could not be sent.'|trans|json_encode|raw }} };
         }
 
         // Unlike the bridge's render(), copies nothing from the result into fields of the same name.
@@ -59,7 +60,7 @@
             }
             callTool(form.getAttribute('data-call'), fields)
                 .then((result) => render(extractModel(result)))
-                .catch((error) => render({ problem: (error && error.message) || 'The form could not be sent.' }));
+                .catch((error) => render({ problem: (error && error.message) || {{ 'The form could not be sent.'|trans|json_encode|raw }} }));
         }, true);
 
         // The bridge measures the document, which never gets shorter than its frame.

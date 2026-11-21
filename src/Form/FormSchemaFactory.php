@@ -33,6 +33,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 final class FormSchemaFactory
 {
+    private const TYPES = ['string', 'integer', 'number', 'boolean', 'array', 'object'];
+
     /**
      * @param iterable<FieldDescriberInterface>      $fieldDescribers
      * @param iterable<ConstraintDescriberInterface> $constraintDescribers
@@ -119,9 +121,14 @@ final class FormSchemaFactory
     private function describedByTheApplication(FormInterface $field, FormView $view): ?array
     {
         foreach ($this->fieldDescribers as $describer) {
-            if (null !== $schema = $describer->describe($field, $view)) {
-                return $schema;
+            if (null === $schema = $describer->describe($field, $view)) {
+                continue;
             }
+            if (!\in_array($schema['type'] ?? null, self::TYPES, true) || !\is_string($schema['description'] ?? '')) {
+                throw new UnsupportedFieldException(\sprintf('%s describes the field "%s" with a schema FormBridge cannot use: it needs a "type" (one of %s) and, if any, a text "description".', $describer::class, FormInspector::path($field), implode(', ', self::TYPES)));
+            }
+
+            return $schema;
         }
 
         return null;
@@ -195,13 +202,13 @@ final class FormSchemaFactory
     }
 
     /**
-     * @param array<string, string> $notes
+     * @param array<int|string, string> $notes
      */
     private function describeConstraint(Constraint $constraint, array &$notes): void
     {
         foreach ($this->constraintDescribers as $describer) {
             if (null !== $note = $describer->describe($constraint)) {
-                $notes[$constraint::class] = $note;
+                $notes[] = $note;
 
                 return;
             }

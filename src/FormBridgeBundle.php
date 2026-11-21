@@ -91,7 +91,6 @@ final class FormBridgeBundle extends AbstractBundle
 
         if (null !== $config['drafts']['cache_pool']) {
             $builder->getDefinition('form_bridge.draft_store')->replaceArgument(0, new Reference($config['drafts']['cache_pool']));
-            $builder->removeDefinition('form_bridge.cache');
         }
 
         $builder->registerForAutoconfiguration(FieldDescriberInterface::class)->addTag('form_bridge.field_describer');

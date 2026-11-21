@@ -14,35 +14,69 @@
     "require": {
         "php": ">=8.2",
         "mcp/sdk": "^0.9",
+        "nyholm/psr7": "^1.8",
         "psr/cache": "^2.0|^3.0",
         "psr/container": "^1.1|^2.0",
         "psr/event-dispatcher": "^1.0",
         "psr/log": "^1.0|^2.0|^3.0",
-        "symfony/config": "^7.3|^8.0",
-        "symfony/console": "^7.3|^8.0",
-        "symfony/dependency-injection": "^7.3|^8.0",
-        "symfony/event-dispatcher": "^7.3|^8.0",
-        "symfony/form": "^7.3|^8.0",
-        "symfony/framework-bundle": "^7.3|^8.0",
-        "symfony/http-foundation": "^7.3|^8.0",
-        "symfony/http-kernel": "^7.3|^8.0",
-        "symfony/lock": "^7.3|^8.0",
+        "symfony/cache": "^7.4|^8.0",
+        "symfony/config": "^7.4|^8.0",
+        "symfony/console": "^7.4|^8.0",
+        "symfony/dependency-injection": "^7.4|^8.0",
+        "symfony/event-dispatcher": "^7.4|^8.0",
+        "symfony/form": "^7.4|^8.0",
+        "symfony/framework-bundle": "^7.4|^8.0",
+        "symfony/http-foundation": "^7.4|^8.0",
+        "symfony/http-kernel": "^7.4|^8.0",
+        "symfony/lock": "^7.4|^8.0",
         "symfony/mcp-bundle": "^1.0@beta",
-        "symfony/routing": "^7.3|^8.0",
-        "symfony/security-csrf": "^7.3|^8.0",
+        "symfony/routing": "^7.4|^8.0",
+        "symfony/security-csrf": "^7.4|^8.0",
         "symfony/service-contracts": "^2.5|^3.0",
         "symfony/translation-contracts": "^2.5|^3.0",
-        "symfony/twig-bundle": "^7.3|^8.0",
-        "symfony/validator": "^7.3|^8.0"
+        "symfony/twig-bundle": "^7.4|^8.0",
+        "symfony/validator": "^7.4|^8.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.5|^12.0|^13.0",
+        "symfony/ai-agent": "^1.0@beta",
+        "symfony/ai-platform": "^1.0@beta",
+        "symfony/browser-kit": "^7.4|^8.0",
+        "symfony/css-selector": "^7.4|^8.0",
+        "symfony/rate-limiter": "^7.4|^8.0",
+        "symfony/translation": "^7.4|^8.0"
+    },
+    "conflict": {
+        "symfony/ai-agent": "<1.0",
+        "symfony/ai-bundle": "<1.0",
+        "symfony/ai-platform": "<1.0"
     },
     "suggest": {
-        "symfony/ai-agent": "To give the form tools to Symfony AI agents (form_bridge.agents)",
+        "symfony/ai-agent": "With symfony/ai-bundle, to give the form tools to Symfony AI agents (form_bridge.agents)",
         "symfony/ai-platform": "To fill forms in from free text with a model (form_bridge.fill)",
-        "symfony/rate-limiter": "To limit how often the \"paste a message\" page calls the model (form_bridge.fill.rate_limiter)"
+        "symfony/rate-limiter": "To limit how often the \"paste a message\" page calls the model (form_bridge.fill.rate_limiter)",
+        "symfony/translation": "To show the texts of the forms in the visitor's language"
     },
     "autoload": {
         "psr-4": {
             "FormBridge\\": "src/"
         }
-    }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "FormBridge\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "php-http/discovery": true,
+            "symfony/flex": true
+        }
+    },
+    "minimum-stability": "beta",
+    "prefer-stable": true
 }

@@ -34,6 +34,20 @@ final class FormToolSchemas
     }
 
     /**
+     * Why a form tool cannot be exposed, or null if it can.
+     */
+    public function problemWith(FormTool $tool): ?string
+    {
+        try {
+            $this->of($tool);
+        } catch (UnsupportedFieldException $unsupported) {
+            return $unsupported->getMessage();
+        }
+
+        return null;
+    }
+
+    /**
      * Every form tool that can be described, with its schema.
      *
      * A form with an unsupported field is an error in debug mode. Otherwise it is logged and left

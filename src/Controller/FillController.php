@@ -20,6 +20,7 @@ use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
 /**
@@ -39,6 +40,7 @@ final class FillController
         private readonly bool $debug = false,
         private readonly ?RateLimiterFactoryInterface $limiter = null,
         private readonly LoggerInterface $logger = new NullLogger(),
+        private readonly ?TranslatorInterface $translator = null,
     ) {
     }
 
@@ -56,7 +58,7 @@ final class FillController
         if ($form->isSubmitted() && $form->isValid()) {
             $limit = $this->limiter?->create($request->getClientIp())->consume();
             if (false === $limit?->isAccepted()) {
-                throw new TooManyRequestsHttpException(max(1, $limit->getRetryAfter()->getTimestamp() - time()), 'Too many messages in a short time. Try again in a moment.');
+                throw new TooManyRequestsHttpException(max(1, $limit->getRetryAfter()->getTimestamp() - time()), $this->trans('Too many messages in a short time. Try again in a moment.'));
             }
 
             try {
@@ -67,7 +69,7 @@ final class FillController
                 ]));
             } catch (\Throwable $error) {
                 $this->logger->error('The message could not be read into "{tool}": {message}', ['tool' => $tool, 'message' => $error->getMessage(), 'exception' => $error]);
-                $form->addError(new FormError('The message could not be read right now.'.($this->debug ? ' '.$error->getMessage() : '')));
+                $form->addError(new FormError($this->trans('The message could not be read right now.').($this->debug ? ' '.$error->getMessage() : '')));
                 $status = Response::HTTP_SERVICE_UNAVAILABLE;
             }
         }
@@ -76,5 +78,10 @@ final class FillController
             $this->twig->render('@FormBridge/fill.html.twig', ['tool' => $formTool, 'form' => $form->createView()]),
             $status,
         );
+    }
+
+    private function trans(string $message): string
+    {
+        return $this->translator?->trans($message, [], 'form_bridge') ?? $message;
     }
 }

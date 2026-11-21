@@ -2,22 +2,23 @@
     Shared by the MCP App and the review page. In the app, `data-call` names the tool the form is
     sent to; on the review page the same markup posts like any other form.
 #}
+{% trans_default_domain 'form_bridge' %}
 {% if outcome.saved %}
     <div class="fb-done">
         <div class="fb-check" aria-hidden="true">✓</div>
-        <h2>Done</h2>
+        <h2>{{ 'Done'|trans }}</h2>
         <p>{{ outcome.result }}</p>
     </div>
 {% else %}
     <div class="fb-head">
-        <h2>{{ tool.title }}</h2>
+        <h2>{{ tool.title|trans({}, 'messages') }}</h2>
         <p>
             {% if outcome.valid %}
-                Filled in for you. Check it, change anything you like, then press “{{ tool.submitLabel }}”.
+                {{ 'Filled in for you. Check it, change anything you like, then press “%button%”.'|trans({'%button%': tool.submitLabel|trans({}, 'messages')}) }}
             {% else %}
-                Filled in for you, but something needs your attention before it can be saved.
+                {{ 'Filled in for you, but something needs your attention before it can be saved.'|trans }}
             {% endif %}
-            Nothing is saved until you press the button.
+            {{ 'Nothing is saved until you press the button.'|trans }}
         </p>
     </div>
 
@@ -29,7 +30,7 @@
         {# A form with its own submit button keeps it. #}
         {% if form.children|filter(child => 'submit' in child.vars.block_prefixes)|length == 0 %}
             <div class="fb-actions">
-                <button type="submit" class="fb-submit">{{ tool.submitLabel }}</button>
+                <button type="submit" class="fb-submit">{{ tool.submitLabel|trans({}, 'messages') }}</button>
             </div>
         {% endif %}
     {{ form_end(form, {render_rest: false}) }}

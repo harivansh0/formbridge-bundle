@@ -50,7 +50,7 @@ return static function (ContainerConfigurator $container): void {
             service('event_dispatcher'),
             service('logger'),
         ])
-        ->tag('monolog.logger', ['channel' => 'formbridge']);
+        ->tag('monolog.logger', ['channel' => 'form_bridge']);
     $services->alias(FormToolRunner::class, 'form_bridge.runner');
 
     $services->set('form_bridge.tool_schemas', FormToolSchemas::class)
@@ -61,7 +61,7 @@ return static function (ContainerConfigurator $container): void {
             param('kernel.debug'),
             service('logger'),
         ])
-        ->tag('monolog.logger', ['channel' => 'formbridge']);
+        ->tag('monolog.logger', ['channel' => 'form_bridge']);
     $services->alias(FormToolSchemas::class, 'form_bridge.tool_schemas');
 
     $services->set('form_bridge.cache')
@@ -86,6 +86,7 @@ return static function (ContainerConfigurator $container): void {
             service('form_bridge.runner'),
             service('form_bridge.mcp.responder'),
             service('form_bridge.draft_store'),
+            service('translator')->nullOnInvalid(),
         ])
         ->tag('mcp.loader');
 
@@ -127,8 +128,9 @@ return static function (ContainerConfigurator $container): void {
             param('kernel.debug'),
             null,
             service('logger'),
+            service('translator')->nullOnInvalid(),
         ])
-        ->tag('monolog.logger', ['channel' => 'formbridge']);
+        ->tag('monolog.logger', ['channel' => 'form_bridge']);
 
     $services->set(PreviewController::class)
         ->public()

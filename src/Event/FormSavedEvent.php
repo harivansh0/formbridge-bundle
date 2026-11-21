@@ -7,7 +7,7 @@ namespace FormBridge\Event;
 use FormBridge\FormOutcome;
 
 /**
- * A person submitted a form and the application's handler saved it.
+ * A form was submitted through FormBridge and the application's handler saved it.
  */
 final class FormSavedEvent
 {

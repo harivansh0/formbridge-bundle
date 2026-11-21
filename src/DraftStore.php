@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace FormBridge;
 
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Cache\Adapter\ChainAdapter;
 use Symfony\Component\Lock\LockFactory;
 
 /**
  * Keeps filled-in forms until a person submits them, and lets each one be saved at most once.
+ *
+ * That holds as long as the pool answers from one shared store and the lock is shared by every
+ * server that can receive the submit.
  */
 final class DraftStore
 {
@@ -17,6 +21,11 @@ final class DraftStore
         private readonly LockFactory $lockFactory,
         private readonly int $lifetime = 3600,
     ) {
+        // A local tier in front of the shared store can answer "still open" after another request
+        // has saved the draft, which would let it be saved twice.
+        if ($cache instanceof ChainAdapter) {
+            throw new \LogicException('FormBridge cannot keep drafts in a chained cache pool: use the shared store directly.');
+        }
     }
 
     /**
@@ -29,7 +38,7 @@ final class DraftStore
             bin2hex(random_bytes(16)),
             $toolName,
             $values,
-            new \DateTimeImmutable('+'.$this->lifetime.' seconds'),
+            new \DateTimeImmutable('@'.(time() + $this->lifetime)),
         );
         $this->keep($draft);
 

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="de" datatype="plaintext" original="form_bridge.en.xlf">
+        <body>
+            <trans-unit id="1">
+                <source>Done</source>
+                <target>Fertig</target>
+            </trans-unit>
+            <trans-unit id="2">
+                <source>Filled in for you. Check it, change anything you like, then press “%button%”.</source>
+                <target>Für Sie ausgefüllt. Prüfen Sie die Angaben, ändern Sie, was Sie möchten, und klicken Sie dann auf „%button%“.</target>
+            </trans-unit>
+            <trans-unit id="3">
+                <source>Filled in for you, but something needs your attention before it can be saved.</source>
+                <target>Für Sie ausgefüllt, aber vor dem Speichern muss noch etwas korrigiert werden.</target>
+            </trans-unit>
+            <trans-unit id="4">
+                <source>Nothing is saved until you press the button.</source>
+                <target>Es wird nichts gespeichert, bis Sie auf die Schaltfläche klicken.</target>
+            </trans-unit>
+            <trans-unit id="5">
+                <source>Preparing the form…</source>
+                <target>Das Formular wird vorbereitet …</target>
+            </trans-unit>
+            <trans-unit id="6">
+                <source>The form could not be sent.</source>
+                <target>Das Formular konnte nicht gesendet werden.</target>
+            </trans-unit>
+            <trans-unit id="7">
+                <source>%title%: fill in from a message</source>
+                <target>%title%: aus einer Nachricht ausfüllen</target>
+            </trans-unit>
+            <trans-unit id="8">
+                <source>Paste what the person wrote, an email for example. It is read into the form for you to check. Nothing is saved until you press the button on the next page.</source>
+                <target>Fügen Sie ein, was die Person geschrieben hat, zum Beispiel eine E-Mail. Der Text wird in das Formular übertragen, damit Sie es prüfen können. Es wird nichts gespeichert, bis Sie auf der nächsten Seite auf die Schaltfläche klicken.</target>
+            </trans-unit>
+            <trans-unit id="9">
+                <source>Fill in the form</source>
+                <target>Formular ausfüllen</target>
+            </trans-unit>
+            <trans-unit id="10">
+                <source>The message</source>
+                <target>Die Nachricht</target>
+            </trans-unit>
+            <trans-unit id="11">
+                <source>This form is no longer open: it was already saved, or it expired. Ask the assistant to fill it in again.</source>
+                <target>Dieses Formular ist nicht mehr offen: Es wurde bereits gespeichert oder ist abgelaufen. Bitten Sie den Assistenten, es erneut auszufüllen.</target>
+            </trans-unit>
+            <trans-unit id="12">
+                <source>The message could not be read right now.</source>
+                <target>Die Nachricht konnte gerade nicht gelesen werden.</target>
+            </trans-unit>
+            <trans-unit id="13">
+                <source>Too many messages in a short time. Try again in a moment.</source>
+                <target>Zu viele Nachrichten in kurzer Zeit. Versuchen Sie es gleich noch einmal.</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

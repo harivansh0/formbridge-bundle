@@ -61,7 +61,7 @@ final class FormToolPass implements CompilerPassInterface
 
     /**
      * The MCP registry lets a later registration replace an earlier one without a word, and form
-     * tools are registered first.
+     * tools are registered first. Names are compared across all servers.
      *
      * @param list<string> $names
      */
@@ -70,7 +70,11 @@ final class FormToolPass implements CompilerPassInterface
         $taken = array_fill_keys([...$names, ...array_map(static fn (string $name): string => $name.'_submit', $names)], true);
 
         foreach ($container->findTaggedServiceIds('mcp.tool') as $serviceId => $tags) {
-            $class = $container->getParameterBag()->resolveValue($container->getDefinition($serviceId)->getClass() ?? $serviceId);
+            $definition = $container->getDefinition($serviceId);
+            if ($definition->isAbstract()) {
+                continue;
+            }
+            $class = $container->getParameterBag()->resolveValue($definition->getClass() ?? $serviceId);
             $reflection = \is_string($class) ? $container->getReflectionClass($class, false) : null;
             if (null === $reflection) {
                 continue;
@@ -82,8 +86,12 @@ final class FormToolPass implements CompilerPassInterface
                     continue;
                 }
 
-                $attribute = $reflection->getMethod($method)->getAttributes(McpTool::class)[0] ?? $reflection->getAttributes(McpTool::class)[0] ?? null;
-                $name = $attribute?->newInstance()->name ?? ('__invoke' === $method ? $reflection->getShortName() : $method);
+                $reflectionMethod = $reflection->getMethod($method);
+                $attribute = $reflectionMethod->getAttributes(McpTool::class, \ReflectionAttribute::IS_INSTANCEOF)[0]
+                    ?? $reflection->getAttributes(McpTool::class, \ReflectionAttribute::IS_INSTANCEOF)[0]
+                    ?? null;
+                // The SDK names an unnamed __invoke() tool after the class that declares the method.
+                $name = $attribute?->newInstance()->name ?? ('__invoke' === $method ? $reflectionMethod->getDeclaringClass()->getShortName() : $method);
 
                 if (isset($taken[$name])) {
                     throw new LogicException(\sprintf('The MCP tool "%s" of service "%s" has the name of a form tool or of a form\'s submit tool. Rename one of them.', $name, $serviceId));

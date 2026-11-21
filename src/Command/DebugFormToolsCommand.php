@@ -36,10 +36,21 @@ final class DebugFormToolsCommand extends Command
         $name = $input->getArgument('name');
 
         if (null === $name) {
-            $io->table(['Tool', 'Submit tool', 'Form', 'Title', 'Button'], array_map(
-                static fn (FormTool $tool): array => [$tool->name, $tool->submitToolName(), $tool->form, $tool->title, $tool->submitLabel],
+            $problems = [];
+            $io->table(['Tool', 'Submit tool', 'Form', 'Title', 'Button', 'Status'], array_map(
+                function (FormTool $tool) use (&$problems): array {
+                    $problem = $this->schemas->problemWith($tool);
+                    if (null !== $problem) {
+                        $problems[] = $tool->name.': '.$problem;
+                    }
+
+                    return [$tool->name, $tool->submitToolName(), $tool->form, $tool->title, $tool->submitLabel, null === $problem ? 'exposed' : 'NOT exposed'];
+                },
                 $this->tools->all(),
             ));
+            if ([] !== $problems) {
+                $io->warning($problems);
+            }
 
             return Command::SUCCESS;
         }

@@ -15,6 +15,7 @@ use Mcp\Schema\Extension\Apps\ToolVisibility;
 use Mcp\Schema\Extension\Apps\UiToolMeta;
 use Mcp\Schema\Tool;
 use Mcp\Schema\ToolAnnotations;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Registers two MCP tools per form: "<name>" for the model, which only validates, and
@@ -60,6 +61,7 @@ final class FormToolLoader implements LoaderInterface
         private readonly FormToolRunner $runner,
         private readonly FormToolResponder $responder,
         private readonly DraftStore $drafts,
+        private readonly ?TranslatorInterface $translator = null,
     ) {
     }
 
@@ -68,7 +70,7 @@ final class FormToolLoader implements LoaderInterface
         $entries = [];
         foreach ($this->schemas->all() as [$tool, $schema]) {
             $entries[] = ['definition' => $this->draftTool($tool, $schema), 'handler' => new DraftToolHandler($tool->name, $this->runner, $this->responder)];
-            $entries[] = ['definition' => $this->submitTool($tool), 'handler' => new SubmitToolHandler($tool->name, $this->runner, $this->responder, $this->drafts)];
+            $entries[] = ['definition' => $this->submitTool($tool), 'handler' => new SubmitToolHandler($tool->name, $this->runner, $this->responder, $this->drafts, $this->translator)];
         }
 
         (new ExplicitElementLoader(tools: $entries))->load($registry);

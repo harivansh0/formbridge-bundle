@@ -19,6 +19,7 @@ final class MessageType extends AbstractType
     {
         $builder->add('text', TextareaType::class, [
             'label' => 'The message',
+            'translation_domain' => 'form_bridge',
             'constraints' => [
                 new NotBlank(message: 'Paste the message first.'),
                 new Length(max: 5000),

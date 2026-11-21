@@ -1,23 +1,24 @@
+{% trans_default_domain 'form_bridge' %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ tool.title }}: fill in from a message</title>
+    <title>{{ '%title%: fill in from a message'|trans({'%title%': tool.title|trans({}, 'messages')}) }}</title>
     <link rel="icon" href="data:,">
     <style>{{ include('@FormBridge/_styles.css.twig') }}</style>
 </head>
 <body>
     <main class="fb-page">
         <div class="fb-head">
-            <h2>{{ tool.title }}: fill in from a message</h2>
-            <p>Paste what the person wrote, an email for example. It is read into the form for you to check. Nothing is saved until you press the button on the next page.</p>
+            <h2>{{ '%title%: fill in from a message'|trans({'%title%': tool.title|trans({}, 'messages')}) }}</h2>
+            <p>{{ 'Paste what the person wrote, an email for example. It is read into the form for you to check. Nothing is saved until you press the button on the next page.'|trans }}</p>
         </div>
         {{ form_start(form, {attr: {novalidate: 'novalidate', class: 'fb-form'}}) }}
             {{ form_errors(form) }}
             {{ form_rest(form) }}
             <div class="fb-actions">
-                <button type="submit" class="fb-submit">Fill in the form</button>
+                <button type="submit" class="fb-submit">{{ 'Fill in the form'|trans }}</button>
             </div>
         {{ form_end(form, {render_rest: false}) }}
     </main>
