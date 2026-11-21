@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- The form, the review page, the "paste a message" page and the preview use a black and white
+  palette on a white background, and no longer switch to dark colours with the system.
+
 ## 0.1.1 (2026-11-21)
 
 - Option labels are quoted when they are described to a model, in tool descriptions and in a

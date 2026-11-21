@@ -2,10 +2,7 @@
   <title id="t">FormBridge: the sequence of one form tool call</title>
   <desc id="d">Sequence between an agent or MCP client, FormBridge, the application's form type and handler, and a person. 1: the client calls the tool. 2: FormToolRunner::draft() lets the form type validate, returns a FormOutcome and dispatches FormDraftedEvent; the handler is not called. 3: DraftStore::open() keeps a draft with a review token and a submit token. 4: the client gets text and structured content. 5: the rendered form travels in _meta and is shown as an MCP App or behind the review link. 6: the person's submit calls the app-only submit tool with the token. 7: the token is checked and DraftStore::claim() locks and closes the draft. 8: FormToolRunner::submit() validates again, dispatches FormSubmitEvent and calls the handler, then FormSavedEvent. 9: the person gets the confirmation. The submit tool is not offered to the model.</desc>
   <style>
-    :root { --bg: #f5f7f6; --card: #ffffff; --fg: #18211f; --muted: #5b6966; --line: #c3cfcb; --accent: #0f6e66; --soft: #e2f1ee; --stop: #a3261e; --stop-soft: #fbe9e7; }
-    @media (prefers-color-scheme: dark) {
-      :root { --bg: #111715; --card: #18201e; --fg: #e6eceb; --muted: #9aa8a5; --line: #3a4a46; --accent: #5fc4b8; --soft: #17302c; --stop: #f28b82; --stop-soft: #3a201e; }
-    }
+    :root { --bg: #ffffff; --card: #ffffff; --fg: #111111; --muted: #5f5f5f; --line: #cfcfcf; --accent: #111111; --soft: #f3f3f3; --stop: #a3261e; --stop-soft: #fbe9e7; }
     text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; fill: var(--fg); }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
     .head { font-size: 16px; font-weight: 600; }
@@ -38,7 +35,7 @@
     @media (prefers-reduced-motion: reduce) { .s { animation: none; } }
   </style>
 
-  <rect width="1060" height="700" rx="14" fill="var(--bg)"/>
+  <rect x="0.75" y="0.75" width="1058.5" height="698.5" rx="14" fill="var(--bg)" stroke="var(--line)" stroke-width="1.5"/>
 
   <!-- Participants -->
   <rect class="lane" x="24" y="24" width="212" height="58" rx="10"/>

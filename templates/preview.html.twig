@@ -7,10 +7,7 @@
     <title>FormBridge preview</title>
     <link rel="icon" href="data:,">
     <style>
-        :root { --bg: #eef1f4; --card: #ffffff; --fg: #1b2228; --muted: #5d6873; --line: #d5dbe1; --accent: #0f6e66; --accent-fg: #ffffff; --you: #dff1ee; --code: #f5f7f9; --bad: #b3261e; color-scheme: light dark; }
-        @media (prefers-color-scheme: dark) {
-            :root { --bg: #0f1418; --card: #171d23; --fg: #e7ecf0; --muted: #9ba7b2; --line: #2e3740; --accent: #5fc4b8; --accent-fg: #0b1512; --you: #163632; --code: #10161b; --bad: #f28b82; }
-        }
+        :root { --bg: #ffffff; --card: #ffffff; --fg: #111111; --muted: #5f5f5f; --line: #d4d4d4; --accent: #111111; --accent-fg: #ffffff; --you: #f0f0f0; --code: #f6f6f6; --bad: #b3261e; color-scheme: light; }
         * { box-sizing: border-box; }
         body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
         main { max-width: 760px; margin: 0 auto; padding: 24px 16px 80px; }
@@ -20,7 +17,7 @@
         .panel h2 { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; font-weight: 650; }
         .tools { display: flex; flex-wrap: wrap; gap: 8px; }
         .tools button { font: inherit; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--code); color: var(--fg); cursor: pointer; }
-        .tools button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); font-weight: 650; }
+        .tools button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent); color: var(--accent-fg); font-weight: 650; }
         .hidden-tools { color: var(--muted); font-size: 13px; margin: 8px 0 0; }
         textarea { width: 100%; min-height: 96px; font: 13px/1.45 ui-monospace, Menlo, Consolas, monospace; padding: 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--code); color: var(--fg); resize: vertical; }
         .row { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
