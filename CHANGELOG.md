@@ -2,8 +2,8 @@
 
 ## Unreleased
 
-- The form, the review page, the "paste a message" page and the preview use a black and white
-  palette on a white background, and no longer switch to dark colours with the system.
+- The form, the review page, the "paste a message" page and the preview use black text on a
+  white background with a blue accent, and no longer switch to dark colours with the system.
 
 ## 0.1.1 (2026-11-21)
 
