@@ -1,0 +1,77 @@
+{#
+    The MCP App shell for every form tool. The protocol work is the MCP bundle's bridge; the
+    functions below replace the parts of it that do not suit a form that saves.
+#}
+{% extends '@Mcp/app/base.html.twig' %}
+
+{% block title %}Form{% endblock %}
+
+{% block head_script %}
+        // The bridge accepts messages from any window; only the embedding host may talk to the form.
+        window.addEventListener('message', (event) => {
+            if (event.source !== window.parent) event.stopImmediatePropagation();
+        }, true);
+{% endblock %}
+
+{% block style %}{{ include('@FormBridge/_styles.css.twig') }}{% endblock %}
+
+{% block body %}<div id="root"><p class="fb-wait">Preparing the form…</p></div>{% endblock %}
+
+{% block app_script %}
+        // The rendered form travels in `_meta`, not in `structuredContent`.
+        function extractModel(params) {
+            if (!params) return null;
+            const html = params._meta && params._meta['{{ constant('FormBridge\\Mcp\\FormBridgeApp::HTML_META_KEY') }}'];
+            if (typeof html === 'string') return { html };
+            const text = (params.content || []).filter((item) => item.type === 'text').map((item) => item.text).join(' ');
+            return { problem: text || 'The form could not be sent.' };
+        }
+
+        // Unlike the bridge's render(), copies nothing from the result into fields of the same name.
+        function render(model) {
+            const root = document.getElementById('root');
+            if (!model || !root) return;
+            if (typeof model.html === 'string') {
+                root.innerHTML = model.html;
+            } else if (model.problem) {
+                root.querySelector('.fb-problem')?.remove();
+                const note = document.createElement('p');
+                note.className = 'fb-problem';
+                note.textContent = model.problem;
+                root.prepend(note);
+            }
+        }
+
+        // Runs before the bridge's own submit handler, which keeps one value per field name and
+        // drops the pressed button.
+        document.addEventListener('submit', (event) => {
+            const form = event.target.closest('form[data-call]');
+            if (!form) return;
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            const fields = Object.create(null);
+            for (const [name, value] of new FormData(form, event.submitter)) {
+                if (name.endsWith('[]')) {
+                    (fields[name.slice(0, -2)] ||= []).push(value);
+                } else {
+                    fields[name] = value;
+                }
+            }
+            callTool(form.getAttribute('data-call'), fields)
+                .then((result) => render(extractModel(result)))
+                .catch((error) => render({ problem: (error && error.message) || 'The form could not be sent.' }));
+        }, true);
+
+        // The bridge measures the document, which never gets shorter than its frame.
+        function reportSize() {
+            const box = document.body.getBoundingClientRect();
+            const w = Math.ceil(box.width);
+            const h = Math.ceil(box.height);
+            if (w === lastW && h === lastH) return;
+            lastW = w; lastH = h;
+            sendNotification('ui/notifications/size-changed', { width: w, height: h });
+        }
+
+        // Frames scrolled out of view get no resize callbacks.
+        new MutationObserver(() => reportSize()).observe(document.getElementById('root'), { childList: true });
+{% endblock %}

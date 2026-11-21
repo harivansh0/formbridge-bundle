@@ -1,0 +1,42 @@
+:root {
+    --fb-bg: #ffffff; --fb-fg: #1b2228; --fb-muted: #5d6873; --fb-line: #d5dbe1; --fb-field: #ffffff;
+    --fb-accent: #0f6e66; --fb-accent-fg: #ffffff; --fb-bad: #b3261e; --fb-bad-soft: #fbe9e7; --fb-good: #1f7a3a;
+    color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+    :root {
+        --fb-bg: #171d23; --fb-fg: #e7ecf0; --fb-muted: #9ba7b2; --fb-line: #323c46; --fb-field: #10161b;
+        --fb-accent: #5fc4b8; --fb-accent-fg: #0b1512; --fb-bad: #f28b82; --fb-bad-soft: #3a201e; --fb-good: #7fd49a;
+    }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--fb-bg); color: var(--fb-fg); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+#root, .fb-page { padding: 18px 20px 20px; max-width: 560px; }
+.fb-wait { color: var(--fb-muted); margin: 0; }
+.fb-head h2, .fb-done h2 { margin: 0 0 4px; font-size: 19px; font-weight: 650; }
+.fb-head p { margin: 0 0 16px; color: var(--fb-muted); font-size: 13.5px; }
+.fb-form > div { margin-bottom: 14px; }
+.fb-form label { display: block; font-weight: 600; font-size: 13.5px; margin-bottom: 4px; }
+.fb-form label.required::after { content: " *"; color: var(--fb-bad); }
+.fb-form input[type="text"], .fb-form input[type="email"], .fb-form input[type="number"], .fb-form input[type="url"],
+.fb-form input[type="date"], .fb-form input[type="datetime-local"], .fb-form input[type="time"], .fb-form select, .fb-form textarea {
+    width: 100%; padding: 8px 10px; font: inherit; color: var(--fb-fg); background: var(--fb-field);
+    border: 1px solid var(--fb-line); border-radius: 6px;
+}
+.fb-form textarea { min-height: 72px; resize: vertical; }
+.fb-form textarea#message_text { min-height: 150px; }
+.fb-form input:focus, .fb-form select:focus, .fb-form textarea:focus { outline: 2px solid var(--fb-accent); outline-offset: 1px; }
+.fb-form .help-text { color: var(--fb-muted); font-size: 12.5px; margin-top: 3px; }
+/* Symfony renders a field's validation messages as a list right above the field. */
+.fb-form ul { list-style: none; margin: 0 0 6px; padding: 7px 10px; background: var(--fb-bad-soft); color: var(--fb-bad);
+    border-left: 3px solid var(--fb-bad); border-radius: 4px; font-size: 13.5px; font-weight: 550; }
+.fb-form ul + input, .fb-form ul + select, .fb-form ul + textarea { border-color: var(--fb-bad); }
+.fb-problem { margin: 0 0 14px; padding: 8px 12px; background: var(--fb-bad-soft); color: var(--fb-bad); border-left: 3px solid var(--fb-bad); border-radius: 4px; font-size: 13.5px; font-weight: 550; }
+.fb-actions { margin-top: 18px; }
+.fb-submit { font: inherit; font-weight: 650; padding: 9px 18px; border: 0; border-radius: 6px; cursor: pointer;
+    background: var(--fb-accent); color: var(--fb-accent-fg); }
+.fb-submit:hover { filter: brightness(1.08); }
+.fb-done { display: grid; grid-template-columns: auto 1fr; column-gap: 12px; align-items: start; }
+.fb-check { grid-row: span 2; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
+    background: var(--fb-good); color: var(--fb-bg); font-weight: 700; }
+.fb-done p { margin: 0; color: var(--fb-muted); }

@@ -1,0 +1,176 @@
+{# Development preview: calls a form tool over MCP and renders its form as an MCP Apps host would. #}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FormBridge preview</title>
+    <link rel="icon" href="data:,">
+    <style>
+        :root { --bg: #eef1f4; --card: #ffffff; --fg: #1b2228; --muted: #5d6873; --line: #d5dbe1; --accent: #0f6e66; --accent-fg: #ffffff; --you: #dff1ee; --code: #f5f7f9; --bad: #b3261e; color-scheme: light dark; }
+        @media (prefers-color-scheme: dark) {
+            :root { --bg: #0f1418; --card: #171d23; --fg: #e7ecf0; --muted: #9ba7b2; --line: #2e3740; --accent: #5fc4b8; --accent-fg: #0b1512; --you: #163632; --code: #10161b; --bad: #f28b82; }
+        }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+        main { max-width: 760px; margin: 0 auto; padding: 24px 16px 80px; }
+        h1 { font-size: 22px; margin: 0 0 4px; }
+        p.lede { color: var(--muted); margin: 0 0 20px; }
+        .panel { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; }
+        .panel h2 { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; font-weight: 650; }
+        .tools { display: flex; flex-wrap: wrap; gap: 8px; }
+        .tools button { font: inherit; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--code); color: var(--fg); cursor: pointer; }
+        .tools button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); font-weight: 650; }
+        .hidden-tools { color: var(--muted); font-size: 13px; margin: 8px 0 0; }
+        textarea { width: 100%; min-height: 96px; font: 13px/1.45 ui-monospace, Menlo, Consolas, monospace; padding: 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--code); color: var(--fg); resize: vertical; }
+        .row { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
+        .call { font: inherit; font-weight: 650; padding: 8px 16px; border: 0; border-radius: 8px; background: var(--accent); color: var(--accent-fg); cursor: pointer; }
+        .hint { color: var(--muted); font-size: 13px; }
+        .turn { margin-bottom: 14px; }
+        .who { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 650; margin: 0 0 4px 2px; }
+        .bubble { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; }
+        .bubble.call-card { background: var(--you); border-color: transparent; }
+        pre { margin: 0; white-space: pre-wrap; word-break: break-word; font: 13px/1.45 ui-monospace, Menlo, Consolas, monospace; }
+        .error { color: var(--bad); }
+        iframe { display: block; width: 100%; height: 120px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); }
+        details { margin-top: 6px; } summary { cursor: pointer; color: var(--muted); font-size: 13px; }
+    </style>
+</head>
+<body>
+<main>
+    <h1>FormBridge preview</h1>
+    <p class="lede">One tool call, both sides of its result: the text the model reads and the form the person gets.</p>
+
+    <section class="panel">
+        <h2>Tools the model can see</h2>
+        <div class="tools" id="tools"><span class="hint">Connecting…</span></div>
+        <p class="hidden-tools" id="hidden-tools"></p>
+    </section>
+
+    <section class="panel">
+        <h2>Values the model sends</h2>
+        <textarea id="args" spellcheck="false">{}</textarea>
+        <div class="row">
+            <button class="call" id="call" disabled>Call tool</button>
+            <span class="hint" id="schema-hint"></span>
+        </div>
+        <details><summary>Input schema read from the form</summary><pre id="schema"></pre></details>
+    </section>
+
+    <div id="transcript"></div>
+</main>
+
+<script>{{ include('@FormBridge/_host.js.twig') }}</script>
+<script>
+(async () => {
+    const ENDPOINT = {{ endpoint|json_encode|raw }};
+    const $ = (id) => document.getElementById(id);
+    const { modelText } = FormBridgeHost;
+
+    function turn(who, node, className = '') {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'turn';
+        const label = document.createElement('p');
+        label.className = 'who';
+        label.textContent = who;
+        wrapper.append(label);
+        if (node instanceof HTMLIFrameElement) {
+            wrapper.append(node);
+        } else {
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble ' + className;
+            bubble.append(node);
+            wrapper.append(bubble);
+        }
+        $('transcript').append(wrapper);
+        return wrapper;
+    }
+    function pre(text, className = '') {
+        const element = document.createElement('pre');
+        element.className = className;
+        element.textContent = text;
+        return element;
+    }
+    function showResult(result) {
+        const body = document.createElement('div');
+        body.append(pre(modelText(result), result.isError ? 'error' : ''));
+        if (result.structuredContent) {
+            const details = document.createElement('details');
+            const summary = document.createElement('summary');
+            summary.textContent = 'Structured result';
+            details.append(summary, pre(JSON.stringify(result.structuredContent, null, 2)));
+            body.append(details);
+        }
+        turn('What the model reads', body);
+    }
+
+    let host;
+    try {
+        host = await FormBridgeHost.connect(ENDPOINT);
+    } catch (error) {
+        $('tools').replaceChildren(pre('Could not reach the MCP endpoint at ' + ENDPOINT + ': ' + error.message, 'error'));
+        return;
+    }
+
+    let selected = null;
+    function select(name) {
+        selected = host.tools.get(name);
+        for (const button of $('tools').querySelectorAll('button')) {
+            button.setAttribute('aria-pressed', String(button.dataset.tool === name));
+        }
+        $('schema').textContent = JSON.stringify(selected.inputSchema, null, 2);
+        $('schema-hint').textContent = selected.description.split('. ')[0] + '.';
+        $('call').disabled = false;
+    }
+
+    async function call() {
+        let args;
+        try { args = JSON.parse($('args').value || '{}'); } catch (error) {
+            turn('Preview', pre('The values are not valid JSON: ' + error.message, 'error'));
+            return;
+        }
+        $('transcript').replaceChildren();
+        turn('The model calls ' + selected.name, pre(JSON.stringify(args, null, 2)), 'call-card');
+        try {
+            const result = await host.call(selected.name, args);
+            showResult(result);
+            if (host.hasForm(selected) && !result.isError) {
+                const frame = document.createElement('iframe');
+                frame.title = 'Form shown in the chat';
+                turn('What the person sees in the chat', frame).scrollIntoView({ block: 'nearest' });
+                await host.showForm(frame, selected, args, result, {
+                    onFormCall: (name, callResult) => turn(
+                        'The person pressed the button: the form called ' + name,
+                        pre(modelText(callResult), callResult.isError ? 'error' : ''),
+                    ),
+                });
+            }
+        } catch (error) {
+            turn('What the model reads', pre((error.rpcError ? 'The call was rejected before it reached the form: ' : '') + error.message, 'error'));
+        }
+    }
+
+    $('tools').replaceChildren();
+    for (const tool of host.tools.values()) {
+        if (!host.visibleTo(tool, 'model')) continue;
+        const button = document.createElement('button');
+        button.dataset.tool = tool.name;
+        button.textContent = tool.name;
+        button.addEventListener('click', () => select(tool.name));
+        $('tools').append(button);
+    }
+    const hidden = [...host.tools.values()].filter((tool) => !host.visibleTo(tool, 'model')).map((tool) => tool.name);
+    $('hidden-tools').textContent = hidden.length ? 'Kept from the model, for the form only: ' + hidden.join(', ') + '.' : '';
+    $('call').addEventListener('click', call);
+
+    // ?tool=create_booking&args={"seats":2} selects the tool and calls it.
+    const query = new URLSearchParams(location.search);
+    const wanted = query.get('tool');
+    const first = wanted && host.tools.has(wanted) ? wanted : $('tools').querySelector('button')?.dataset.tool;
+    if (first) select(first);
+    if (query.has('args')) $('args').value = query.get('args');
+    if (wanted && host.tools.has(wanted)) await call();
+})();
+</script>
+</body>
+</html>

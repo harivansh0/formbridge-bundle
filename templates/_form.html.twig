@@ -1,0 +1,36 @@
+{#
+    Shared by the MCP App and the review page. In the app, `data-call` names the tool the form is
+    sent to; on the review page the same markup posts like any other form.
+#}
+{% if outcome.saved %}
+    <div class="fb-done">
+        <div class="fb-check" aria-hidden="true">✓</div>
+        <h2>Done</h2>
+        <p>{{ outcome.result }}</p>
+    </div>
+{% else %}
+    <div class="fb-head">
+        <h2>{{ tool.title }}</h2>
+        <p>
+            {% if outcome.valid %}
+                Filled in for you. Check it, change anything you like, then press “{{ tool.submitLabel }}”.
+            {% else %}
+                Filled in for you, but something needs your attention before it can be saved.
+            {% endif %}
+            Nothing is saved until you press the button.
+        </p>
+    </div>
+
+    {{ form_start(form, {attr: {'data-call': tool.submitToolName, novalidate: 'novalidate', class: 'fb-form'}}) }}
+        {% if submit_token|default(null) %}<input type="hidden" name="{{ constant('FormBridge\\Mcp\\SubmitToolHandler::TOKEN_FIELD') }}" value="{{ submit_token }}">{% endif %}
+        {% if review_proof|default(null) %}<input type="hidden" name="{{ review_proof_field }}" value="{{ review_proof }}">{% endif %}
+        {{ form_errors(form) }}
+        {{ form_rest(form) }}
+        {# A form with its own submit button keeps it. #}
+        {% if form.children|filter(child => 'submit' in child.vars.block_prefixes)|length == 0 %}
+            <div class="fb-actions">
+                <button type="submit" class="fb-submit">{{ tool.submitLabel }}</button>
+            </div>
+        {% endif %}
+    {{ form_end(form, {render_rest: false}) }}
+{% endif %}
