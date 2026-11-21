@@ -3,17 +3,16 @@
 ## Installation
 
 ```bash
-composer config repositories.formbridge vcs https://github.com/harivansh0/formbridge-bundle
-composer require formbridge/formbridge-bundle:dev-main
+composer require formbridge/formbridge-bundle
 ```
 
-The first line is only needed while the package is not listed on Packagist. The application must
-allow beta packages (`"minimum-stability": "beta"`, `"prefer-stable": true`), because the bundle
-needs `symfony/mcp-bundle` 1.0 (beta) and `mcp/sdk` 0.9. It also installs `nyholm/psr7`, which the
-MCP HTTP transport needs.
+The application must allow beta packages (`"minimum-stability": "beta"`, `"prefer-stable": true`),
+because the bundle needs `symfony/mcp-bundle` 1.0 (beta) and `mcp/sdk` 0.9. It also installs
+`nyholm/psr7`, which the MCP HTTP transport needs.
 
-FormBridge adds to an MCP server that `symfony/mcp-bundle` runs: enable that bundle, configure at
-least one server under `mcp.servers` and import its routes, as its own documentation describes.
+FormBridge adds to an MCP server that `symfony/mcp-bundle` runs. With Symfony Flex, the recipes
+enable both bundles and configure a default server at `/mcp`. Without Flex, register the bundles
+yourself:
 
 ```php
 // config/bundles.php
@@ -22,6 +21,8 @@ return [
     FormBridge\FormBridgeBundle::class => ['all' => true],
 ];
 ```
+
+Then import the bundle's routes:
 
 ```yaml
 # config/routes/form_bridge.yaml

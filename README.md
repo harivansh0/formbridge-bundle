@@ -24,6 +24,12 @@ final class CreateBookingHandler
 }
 ```
 
+## Installation
+
+```bash
+composer require formbridge/formbridge-bundle
+```
+
 ## Requirements
 
 PHP 8.2+, Symfony 7.4+ with Form, Validator, Twig, Lock and CSRF protection, `symfony/mcp-bundle`
